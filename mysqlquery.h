@@ -11,6 +11,7 @@ protected:
 
 public:
     bool connect(string host, string user, string pass, string db);
+    void connect(Mysqlquery& copy);
     Mysqlquery();
     ~Mysqlquery();
 };

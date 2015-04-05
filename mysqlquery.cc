@@ -74,6 +74,14 @@ bool Mysqlquery::connect(string host, string user, string pass, string db)
     return ok;
 }
 
+void Mysqlquery::connect(Mysqlquery& copy)
+{
+	driver = copy.driver;
+	con = copy.con;
+	stmt = copy.stmt;
+	res = copy.res;
+}
+
 Mysqlquery::Mysqlquery()
 {
     con = NULL;
