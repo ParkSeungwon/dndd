@@ -24,7 +24,7 @@ use dndd;
 DROP TABLE IF EXISTS `Sample`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Sample` (
+CREATE TABLE `TroubleShooting` (
   `num` int(11) NOT NULL,
   `page` int(11) DEFAULT NULL,
   `email` char(30) NOT NULL,
