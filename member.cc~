@@ -1,0 +1,41 @@
+#include <iostream>
+using namespace std;
+#include "member.h"
+
+bool Member::auth(string _password) 
+{
+	if (password == _password) return true;
+	else return false;
+}
+
+bool Member::checkValidEmail(string _email)
+{
+	int i = 1;
+	while(i < _email.length() - 1) {
+		if(_email[i++] == '@') return true;
+	}
+	return false;
+}
+
+string Member::setInfo(string _email, string _password, Level _level, string _name, string _tel, string _follow)
+{
+	string errorMessage = "No Error";
+	if(!checkValidEmail(_email)) errorMessage = "email is invalid!";
+	else email = _email;
+	if(_password.length() < 6 && _password.length() > 20) errorMessage = "password should be 6~20 letters!";
+	else password = _password;
+	level = _level;
+	name = _name;
+	tel = _tel;
+	follow = _follow;
+	return errorMessage;
+}
+
+void Member::show()
+{
+	cout << "email : " << email << endl;
+	//cout << "level : " << Util::Ltos(level) << endl;
+	cout << "name : " << name << endl;
+	cout << "tel : " << tel << endl;
+	cout << "follow : " << follow << endl;
+}

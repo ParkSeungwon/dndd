@@ -137,12 +137,12 @@ void GtkMainForm::freeComments()
 
 bool GtkMainForm::openConnection(string host, string _user, string _pass, string db)
 {
-	if(board.connect(host, user, pass, db) &&
-       member.connect(host, user, pass, db) &&
-       vote.connect(host, user, pass, db) ) {
-        member.login(_user, _pass);
-        commentSetup("", 0, 0);
-        label3.set_markup(" || <b>" + member.getName() + "</b>, <b>" + Util::Ltos(member.getLevel()) + "</b>");
+	if(board.connect(host, user, pass, db) ) {
+		member.connect(board);
+       vote.connect(board);
+       member.login(_user, _pass);
+       commentSetup("", 0, 0);
+       label3.set_markup(" || <b>" + member.getName() + "</b>, <b>" + Util::Ltos(member.getLevel()) + "</b>");
         return true;
     }
     else return false;

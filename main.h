@@ -4,7 +4,7 @@
 using namespace std;
 #include <gtkmm.h>
 #include <pangomm/fontdescription.h>
-#include <webkit/webkit.h>
+#include <webkit/webkitwebview.h>
 
 #include <cppconn/connection.h>
 #include <cppconn/driver.h>

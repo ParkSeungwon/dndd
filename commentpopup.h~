@@ -1,0 +1,18 @@
+class CommentPopup : public Gtk::Window
+{
+protected:
+	char option;
+	string date;
+	Gtk::TextView textview1;
+	Gtk::Button ok, cancel;
+	Gtk::VBox vbox1;
+	Gtk::HBox hbox1;
+	//Gtk::ScrolledWindow scwin1;
+	
+	void on_ok_clicked();
+	void on_cancel_clicked(){hide();}
+	
+public:
+	CommentPopup(char option, string contents, string date);//option 'e' or 'n'
+};
+

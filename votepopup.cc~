@@ -1,0 +1,46 @@
+#include <iostream>
+using namespace std;
+#include <gtkmm.h>
+#include "interface.h"
+#include "votepopup.h"
+#include "member.h"
+#include "util.h"
+
+VotePopup::VotePopup(int option) :
+	check("secret"), frame1("choose options"), button1("Vote"), button2("Exit")
+{
+	which = 0;
+	radioButton = new Gtk::RadioButton[option];
+	Gtk::RadioButton::Group group;
+	group = radioButton[0].get_group();
+	for (int i = 1; i < option; i++) {
+		radioButton[i].set_group(group);
+	}
+	for (int i = 0; i < option; i++) {
+		radioButton[i].set_label("option : " + Util::itos(i+1));
+		radioButton[i].signal_clicked().connect(sigc::bind<int>(sigc::mem_fun(*this, &VotePopup::on_radio_click), i));
+		vbox2.pack_start(radioButton[i]);
+	}
+
+	add(vbox1);
+	vbox1.pack_start(check);
+	vbox1.pack_start(frame1);
+	frame1.add(vbox2);
+	vbox1.pack_start(hbox1);
+	hbox1.pack_start(button1);
+	hbox1.pack_start(button2);
+	vbox1.pack_start(label1);
+	button1.signal_clicked().connect(sigc::mem_fun(*this, &VotePopup::on_vote_click));
+	button2.signal_clicked().connect(sigc::mem_fun(*this, &VotePopup::on_exit_click));
+	set_modal(true);
+	set_position(Gtk::WIN_POS_CENTER_ON_PARENT);
+	show_all_children();
+}
+
+void VotePopup::on_vote_click()
+{
+	extern CommentInterface *pInterface;
+	if(pInterface->votedFor(which + 1, check.get_active()) <= 0)
+		label1.set_label("representatives cannot vote secretly");
+	else hide();
+}

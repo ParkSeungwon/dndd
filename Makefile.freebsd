@@ -1,0 +1,42 @@
+CC = c++
+INC = -I/usr/local/include
+LIB = -L/usr/local/lib #-L/usr/local/lib/qt5
+OBJ = comment.o member.o mysqlboard.o test.o util.o mysqlquery.o mysqlmember.o mysqlvote.o vote.o mainform.o  
+
+gtkmmCFLAG = -I/usr/local/include/gtkmm-3.0 -I/usr/local/lib/gtkmm-3.0/include -I/usr/local/include/atkmm-1.6 -I/usr/local/include/gtk-3.0/unix-print -I/usr/local/include/gdkmm-3.0 -I/usr/local/lib/gdkmm-3.0/include -I/usr/local/include/giomm-2.4 -I/usr/local/lib/giomm-2.4/include -I/usr/local/include/pangomm-1.4 -I/usr/local/lib/pangomm-1.4/include -I/usr/local/include/glibmm-2.4 -I/usr/local/lib/glibmm-2.4/include -I/usr/local/include/gtk-3.0 -I/usr/local/include/atk-1.0 -I/usr/local/include/at-spi2-atk/2.0 -I/usr/local/include/pango-1.0 -I/usr/local/include/harfbuzz -I/usr/local/include/gio-unix-2.0/ -I/usr/local/include/cairomm-1.0 -I/usr/local/lib/cairomm-1.0/include -I/usr/local/include/cairo -I/usr/local/include/pixman-1  -I/usr/local/include/freetype2 -D_THREAD_SAFE -I/usr/local/include/sigc++-2.0 -I/usr/local/lib/sigc++-2.0/include -I/usr/local/include/gdk-pixbuf-2.0 -pthread -I/usr/local/include/glib-2.0 -I/usr/local/include -I/usr/local/include/libpng15
+
+gtkmmLIB = -lgtkmm-3.0 -latkmm-1.6 -lgdkmm-3.0 -lgiomm-2.4 -lpangomm-1.4 -lglibmm-2.4 -lgtk-3 -lgdk-3 -lpangocairo-1.0 -lpango-1.0 -latk-1.0 -lcairo-gobject -lgio-2.0 -lcairomm-1.0 -lcairo -pthread -lsigc-2.0 -lgdk_pixbuf-2.0 -lgobject-2.0 -L/usr/local/lib -lglib-2.0 -lintl
+
+gtk+-3.0LIB = -lgtk-3 -lgdk-3 -lpangocairo-1.0 -lpango-1.0 -latk-1.0 -lcairo-gobject -lcairo -pthread -lgdk_pixbuf-2.0 -lgio-2.0 -lgobject-2.0 -L/usr/local/lib -lglib-2.0 -lintl
+
+gtk+-3.0CFLAG = -I/usr/local/include/gtk-3.0 -I/usr/local/include/cairo -I/usr/local/include/pixman-1 -D_THREAD_SAFE -I/usr/local/include/gdk-pixbuf-2.0 -I/usr/local/include/libpng15 -I/usr/local/include/atk-1.0 -I/usr/local/include/at-spi2-atk/2.0 -I/usr/local/include/pango-1.0  -I/usr/local/include/freetype2 -I/usr/local/include/harfbuzz -I/usr/local/include/gio-unix-2.0/ -pthread -I/usr/local/include/glib-2.0 -I/usr/local/include
+
+webkitgtk-3.0CFLAG = -I/usr/local/include/gtk-3.0 -I/usr/local/include/cairo -I/usr/local/include/pixman-1 -D_THREAD_SAFE -I/usr/local/include/gdk-pixbuf-2.0 -I/usr/local/include/libpng15 -I/usr/local/include/atk-1.0 -I/usr/local/include/at-spi2-atk/2.0 -I/usr/local/include/pango-1.0  -I/usr/local/include/freetype2 -I/usr/local/include/harfbuzz -I/usr/local/include/gio-unix-2.0/ -I/usr/local/include/libsoup-2.4 -pthread -I/usr/local/include/libxml2 -I/usr/local/include/webkitgtk-3.0 -I/usr/local/include/glib-2.0 -I/usr/local/include
+
+webkitgtk-3.0LIB = -lwebkitgtk-3.0 -lgtk-3 -lgdk-3 -lpangocairo-1.0 -lpango-1.0 -latk-1.0 -lcairo-gobject -lcairo -pthread -lgdk_pixbuf-2.0 -lsoup-2.4 -lgio-2.0 -lgobject-2.0 -ljavascriptcoregtk-3.0 -L/usr/local/lib -lglib-2.0 -lintl
+
+test : $(OBJ)
+	$(CC) -g -o test $(INC) $(LIB) $(OBJ) $(webkitgtk-3.0LIB) $(gtkmmLIB) -lmysqlcppconn
+run : test
+	./test&
+comment.o : 
+member.o : 
+mysqlboard.o : mysqlboard.h mysqlboard.cc
+	$(CC) -c $(INC) mysqlboard.cc
+mysqlquery.o : mysqlquery.h mysqlquery.cc
+	$(CC) -c $(INC) mysqlquery.cc
+mysqlmember.o : mysqlmember.h mysqlmember.cc
+	$(CC) -c $(INC) mysqlmember.cc
+test.o : test.h test.cc mainform.o
+	$(CC) -g -c test.cc $(INC)  $(gtkmmCFLAG) $(webkitgtk-3.0CFLAG) 
+util.o : 
+vote.o : 
+mysqlvote.o : mysqlvote.h mysqlvote.cc
+	$(CC) -c $(INC) mysqlvote.cc
+mainform.o : mainform.cc mainform.h
+	$(CC) -g -c mainform.cc $(gtkmmCFLAG) $(webkitgtk-3.0CFLAG)
+menubar.o : menubar.cc menubar.h
+	c++ -c menubar.cc -I/usr/local/include/webkitgtk-3.0 $(gtkmmCFLAG) $(webkitgtk-3.0CFLAG) 
+
+clean :
+	rm *.o test
