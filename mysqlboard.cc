@@ -105,7 +105,8 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
     
 	if(field == "") query = "show tables;";//field
     else if(_num == -1) {//목록
-		query = "select * from " + field;
+    		query = "select * from (select * from " + field;
+		query += " order by date) as my_table_tmp";
 		query += " group by num order by num;";
 	} else if(_page == -1) {//페이지수
         query = "select * from (select * from " + field;
