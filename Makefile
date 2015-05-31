@@ -57,6 +57,10 @@ votepopup.o : votepopup.cc votepopup.h
 
 commentpopup.o : commentpopup.cc commentpopup.h
 	$(CC) -c -g commentpopup.cc $(gtkmmCFLAG) $(gtkCFLAG) $(INC)  $(webkitgtk-3.0CFLAG)
-
+	
+install : 
+	cp dndd /usr/local/bin
+	cp *.html /usr/local/share/man
+	
 clean :
 	rm *.o dndd
