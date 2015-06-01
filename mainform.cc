@@ -148,7 +148,7 @@ bool GtkMainForm::openConnection(string host, string _user, string _pass, string
     else return false;
 }
 
-int GtkMainForm::commentSetup(string field, int num, int page)
+int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
 {
     maxPage = board.setPage(field, num, -1) - 1;
     curPage = page;
@@ -181,7 +181,7 @@ int GtkMainForm::commentSetup(string field, int num, int page)
 			textView1.get_buffer()->set_text(s);
 			if(s.find_first_of('<', 0) < 10) notebook.set_current_page(0);
 			else notebook.set_current_page(1);
-			webkit_web_view_load_html_string(WEBKIT_WEB_VIEW(webview.get()), s.c_str(), "www.naver.com");
+			if(reload == true) webkit_web_view_load_html_string(WEBKIT_WEB_VIEW(webview.get()), s.c_str(), "www.naver.com");
 		}
         else {
             textView1.get_buffer()->set_text(toc);
@@ -393,7 +393,9 @@ int GtkMainForm::write(char option, string title, string text, string date)
     board.setTitle(title);//so just set what has changed
 	board.setPages(curPage);
     board.write(option);//'a'->automatically increase page
-    return commentSetup(board.getField(), board.getNumber(), curPage);//auto
+    bool reload = true;
+    if (title == "코멘트임.") reload = false;
+    return commentSetup(board.getField(), board.getNumber(), curPage, reload);//auto
 }
 
 int GtkMainForm::votedFor(int option, bool secret)

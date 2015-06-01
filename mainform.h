@@ -53,7 +53,7 @@ class GtkMainForm : public Gtk::Window, public CommentInterface
     void switch_page(GtkNotebookPage*, guint page_num);
     virtual bool change_account(GdkEventButton* event);
     virtual void comment_press(Glib::ustring& s);
-    int commentSetup(string field, int num, int page);
+    int commentSetup(string field, int num, int page, bool reload = true);
 
     Mysqlboard board;
     MysqlMember member;
