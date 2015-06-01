@@ -53,7 +53,7 @@ void CommentPopup::on_ok_clicked()
 	string s = textview1.get_buffer()->get_text();
 	string t = "코멘트임.";
 	pInterface->write(option, t, s, date);
-	std::cout << t << std::endl;
+	//std::cout << t << std::endl;
 	hide();
 }
 

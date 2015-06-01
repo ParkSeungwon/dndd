@@ -286,7 +286,7 @@ void GtkMainForm::on_toolbar_finalize()
 
 void GtkMainForm::on_menu_tutorial()
 {
-	ifstream infile("tutorial.html");
+	ifstream infile("/usr/local/share/man/tutorial.html");
 	string s, t;
 	while(infile>>s) t += s + " ";
 	infile.close();
@@ -297,7 +297,7 @@ void GtkMainForm::on_menu_tutorial()
 
 void GtkMainForm::on_menu_manual()
 {
-    ifstream infile("manual.html");
+    ifstream infile("/usr/local/share/man/manual.html");
     string s, t;
 	while(infile>>s) t += s + " ";
 	infile.close();
@@ -315,7 +315,7 @@ void GtkMainForm::on_menu_option()
 
 void GtkMainForm::on_menu_about()
 {
-	ifstream infile("licence.html");
+	ifstream infile("/usr/local/share/man/licence.html");
     string s, t;
 	while(infile>>s) t += s + " ";
 	infile.close();
