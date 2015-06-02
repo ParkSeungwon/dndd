@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <body>
 <img src=http://s5.postimg.org/r5xhc9ntz/layer1.png align=right>
 
