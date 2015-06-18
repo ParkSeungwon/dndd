@@ -221,7 +221,6 @@ int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
 			if(s.find_first_of('<', 0) < 10) 
 				label[i].set_markup(board.getText() + "\n<i><small>\t\ton " + board.getDate() + "</small></i>");
 			else label[i].set_label(board.getText() + "\n\t\ton " + board.getDate());
-
             sbind = board.getId() + " " + board.getDate() + "\n" + board.getText();
 		}
         
