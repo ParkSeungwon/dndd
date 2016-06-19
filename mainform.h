@@ -1,3 +1,18 @@
+class CommentBox : public Gtk::EventBox
+{
+public:
+	CommentBox();
+	void set_label(string s) { label.set_label(s); }
+	void set_date(string s) { date.set_label(s); }
+	void set_frame(string s) { frame.set_label(s); }
+	void set_markup(string s) { label.set_markup(s); }
+protected:
+	bool on_button_press_event(GdkEventButton *e);
+	Gtk::VBox vbox;
+	Gtk::Label label, date;
+	Gtk::Frame frame;
+};
+
 class GtkMainForm : public Gtk::Window, public CommentInterface
 {
  private:
@@ -20,8 +35,8 @@ class GtkMainForm : public Gtk::Window, public CommentInterface
     Gtk::Notebook notebook;
     Gtk::CheckButton check1;
     
-    Gtk::Frame *frame;
-    Gtk::Label *label, label1, label2, label3, label4, label5;
+	CommentBox* combox;
+    Gtk::Label label1, label2, label3, label4, label5;
 	Gtk::Viewport viewport1;
     Gtk::Button *button, button1;
 	Gtk::EventBox eventbox1;
@@ -52,7 +67,7 @@ class GtkMainForm : public Gtk::Window, public CommentInterface
     void on_toolbar_finalize();
     void switch_page(GtkNotebookPage*, guint page_num);
     virtual bool change_account(GdkEventButton* event);
-    virtual void comment_press(Glib::ustring& s);
+    virtual void comment_press(Glib::ustring frame, Glib::ustring label, Glib::ustring date);
     int commentSetup(string field, int num, int page, bool reload = true);
 
     Mysqlboard board;

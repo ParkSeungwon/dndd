@@ -19,8 +19,34 @@
  */
 
 #include "main.h"
-
+#include<functional>
+using namespace std::placeholders;
 CommentInterface *pInterface;
+
+CommentBox::CommentBox()
+{
+	add_events(Gdk::BUTTON_PRESS_MASK);
+	add(frame);
+	frame.add(vbox);
+	vbox.add(label);
+	vbox.add(date);
+	//set_size_request(290);
+	label.set_use_markup(true);
+	label.set_line_wrap_mode(Pango::WRAP_CHAR);
+	label.set_line_wrap();
+	label.set_justify(Gtk::JUSTIFY_LEFT);
+	date.set_justify(Gtk::JUSTIFY_RIGHT);
+	show_all_children();
+}
+
+bool CommentBox::on_button_press_event(GdkEventButton* e)
+{
+	if(e->type == GDK_BUTTON_PRESS && e->button == 1) {
+		pInterface->comment_press(frame.get_label(), label.get_label(), date.get_label());
+	}
+	return true;
+}
+		
 
 GtkMainForm::GtkMainForm(int argc, char *argv[]) :
     item1("Database"), item2("Help"), subitem11("Connect"), subitem12("Option"),
@@ -36,7 +62,7 @@ GtkMainForm::GtkMainForm(int argc, char *argv[]) :
 		pass = "dndddndd";
 	}
     curLev = 1;
-    frame = NULL; label = NULL; button = NULL; hBox = NULL;
+	combox = nullptr;
     
 	menuBar1Setup();
 	toolbar1Setup();
@@ -61,14 +87,14 @@ GtkMainForm::GtkMainForm(int argc, char *argv[]) :
 	hBox3.pack_start(eventbox1, Gtk::PACK_SHRINK);
 	eventbox1.add(label3);
 	eventbox1.set_events(Gdk::BUTTON_PRESS_MASK);
-	eventbox1.signal_button_press_event().connect(sigc::mem_fun(*this, &GtkMainForm::change_account));
+	eventbox1.signal_button_press_event().connect(sigc::mem_fun(*this,&GtkMainForm::change_account));
 	eventbox1.set_tooltip_text("change password & personal info");
    
 	//Notebook
 	vBox2.pack_start(notebook);
 	notebook.append_page(scrolledWindow1, "Html view");
 	notebook.append_page(vBox5, "Text view");
-	notebook.signal_switch_page().connect(sigc::mem_fun(*this, &GtkMainForm::switch_page));
+	notebook.signal_switch_page().connect(bind(&GtkMainForm::switch_page, this, _1, _2));
 	vBox5.pack_start(scwin3);
 	scwin3.set_policy(Gtk::POLICY_AUTOMATIC, Gtk::POLICY_AUTOMATIC);
 	scwin3.add(textView1);
@@ -90,7 +116,7 @@ GtkMainForm::GtkMainForm(int argc, char *argv[]) :
 	hBox2.pack_start(entry2, Gtk::PACK_SHRINK);
 	entry2.set_size_request(50);
 	entry2.set_activates_default(true);
-	entry2.signal_activate().connect(sigc::mem_fun(*this, &GtkMainForm::on_toolbar_go));
+	entry2.signal_activate().connect(bind(&GtkMainForm::on_toolbar_go, this));
     hBox2.pack_start(label4, Gtk::PACK_SHRINK);
 	hBox2.pack_end(toolbar1);
 	
@@ -103,7 +129,7 @@ GtkMainForm::GtkMainForm(int argc, char *argv[]) :
         toolbar1.get_nth_item(i)->set_sensitive(false);
     }
 	button1.set_sensitive(false);
-	button1.signal_clicked().connect(sigc::mem_fun(*this, &GtkMainForm::on_button1_clicked));
+	button1.signal_clicked().connect(bind(&GtkMainForm::on_button1_clicked, this));
 	set_position(Gtk::WIN_POS_CENTER);
 	show_all_children();
 	on_menu_manual();
@@ -121,17 +147,8 @@ void GtkMainForm::switch_page(GtkNotebookPage*, guint page_num)
 
 void GtkMainForm::freeComments()
 {
-    if(frame != NULL) {
-		delete[] frame; frame = NULL;
-	}
-	if(button != NULL) {
-        delete[] button; button = NULL;
-	}	
-    if(label != NULL) {
-	    delete[] label; label = NULL;
-	}
-	if(hBox != NULL) {
-		delete[] hBox; hBox = NULL;
+    if(combox != NULL) {
+		delete[] combox; combox = NULL;
 	}
 }
 
@@ -195,10 +212,7 @@ int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
 	}
 	
 	freeComments();	//should do this earlier than next line
-    label = new Gtk::Label[count];
-    frame = new Gtk::Frame[count];
-	button = new Gtk::Button[count];
-    hBox = new Gtk::HBox[count];
+    combox = new CommentBox[count];
     
 	for(int i = 0; i < count; i++) {
         string sbind;//bind args
@@ -209,34 +223,26 @@ int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
                 s = board.getText();
                 count--;
             }
-            label[i].set_label(s);
+            combox[i].set_label(s);
             sbind = s;
     	} else if (num == -1){
-			frame[i].set_label(Util::itos(board.getNumber()) );
-			label[i].set_label(board.getTitle());
+			combox[i].set_frame(Util::itos(board.getNumber()) );
+			combox[i].set_label(board.getTitle());
             sbind = Util::itos(board.getNumber());
 		} else {
-			frame[i].set_label(board.getId());
+			combox[i].set_frame(board.getId());
 			string s = board.getText();
 			if(s.find_first_of('<', 0) < 10) 
-				label[i].set_markup(board.getText() + "\n<i><small>\t\ton " + board.getDate() + "</small></i>");
-			else label[i].set_label(board.getText() + "\n\t\ton " + board.getDate());
+				combox[i].set_markup(board.getText() + "\n<i><small>\t\ton " + board.getDate() + "</small></i>");
+			else {
+				combox[i].set_label(board.getText());
+				combox[i].set_date(board.getDate());
+			}
             sbind = board.getId() + " " + board.getDate() + "\n" + board.getText();
 		}
-        
-        label[i].set_use_markup(true);
-        label[i].set_line_wrap_mode(Pango::WRAP_CHAR);
-       	label[i].set_line_wrap();
-       	label[i].set_justify(Gtk::JUSTIFY_FILL);
-        label[i].set_size_request(290);
     
-        button[i].set_label(">");
-        vBox4.pack_start(frame[i], Gtk::PACK_SHRINK);
-		frame[i].add(hBox[i]);
-        hBox[i].pack_start(label[i]);
-        hBox[i].pack_end(button[i], Gtk::PACK_SHRINK);
+        vBox4.pack_start(combox[i], Gtk::PACK_SHRINK);
               
-        button[i].signal_clicked().connect( sigc::bind<Glib::ustring>(sigc::mem_fun(*this, &GtkMainForm::comment_press), sbind.c_str()) );
 		board.read();
 	}
     setSensitive();
@@ -345,27 +351,17 @@ int GtkMainForm::create_new_book(int r, int w, int c, int v, bool turn, string i
     return i;
 }
 
-void GtkMainForm::comment_press(Glib::ustring& s)
+void GtkMainForm::comment_press(Glib::ustring f, Glib::ustring l, Glib::ustring d)
 {
     if(curLev == 3) {//popupId();
-        string txt = s;
-        int space = s.find_first_of(' ', 0);
-		int newline = s.find_first_of('\n', space);
-        int length = s.length();
-        char date[30], id[30];
-        s.copy(date, newline - space, space+1);
-        date[newline - space] = '\0';
-		s.copy(id, space, 0);
-		id[space] = '\0';
-        txt.erase(0, newline+1);
-        if(member.getEmail() == id) {
-			commentpopup = auto_ptr<CommentPopup>(new CommentPopup('e', txt, date));  
+        if(member.getEmail() == f) {
+			commentpopup = auto_ptr<CommentPopup>(new CommentPopup('e', l, d));  
 			commentpopup->set_transient_for(*this);
 			commentpopup->show();
         }
         else if(member.getLevel() > anonymous && member.getLevel() < representative) {
             followPopup = auto_ptr<FollowPopup>(new FollowPopup);
-            followPopup->entry2.set_text(id);
+            followPopup->entry2.set_text(f);
             followPopup->label3.set_label("currently following " + member.getFollow());
             followPopup->set_transient_for(*this);
             followPopup->show();
@@ -373,11 +369,11 @@ void GtkMainForm::comment_press(Glib::ustring& s)
         else label1.set_label("Only registered, regular can follow");
     }
 	else if(curLev == 1) {
-		commentSetup(s, -1, 0);
-		curField = s;
+		commentSetup(l, -1, 0);
+		curField = l;
 	}
 	else if(curLev == 2) {
-		curNumber = Util::stoi(s);
+		curNumber = Util::stoi(f);
         board.setPage(curField, curNumber, 0);
         board.read();
         if(member.getLevel() >= board.getRead()) {

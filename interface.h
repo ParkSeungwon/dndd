@@ -7,4 +7,5 @@ public:
     virtual int followID(string s, bool secret) = 0;
     virtual int votedFor(int option, bool secret) = 0;
 	virtual int write(char option, string, string, string) = 0;
+	virtual void comment_press(Glib::ustring, Glib::ustring, Glib::ustring) = 0;
 };
