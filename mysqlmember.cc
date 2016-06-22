@@ -62,7 +62,9 @@ bool MysqlMember::read(string _id)
 
 bool MysqlMember::login(string user, string pass)
 {
-    string query = "select * from (select * from (select * from Users where email = '";
+	string query = "SET sql_mode = (select replace(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));";
+	myQuery(query);
+    query = "select * from (select * from (select * from Users where email = '";
     query += user + "' order by date desc) as my_table_tmp group by email) as my_table_tmp" ;
     query +=  " where password=password('" + pass + "');";
     //std::cout << query << std::endl;

@@ -34,7 +34,7 @@ using namespace std;
 ConnectPopup::ConnectPopup() : 
 		label1("Host name :"), label2("email addr :"), label3("Password  :"),
         label4("Database  :"), label5("U can use ID:anony@anony, PASS:anony"),
-        button1("Connect"), button2("Save"),
+        button1("_Connect"), button2("Save"),
         button3("Delete"), button4("Exit"), button5("Join"),
         frame1("Choose one Connection")
 {
@@ -76,6 +76,7 @@ ConnectPopup::ConnectPopup() :
     entry4.set_max_length(25);
 	vBox1.pack_start(hBox5);
 	hBox5.pack_start(button1);
+	button1.set_use_underline();
 	hBox5.pack_start(button2);
 	hBox5.pack_start(button3);
 	hBox5.pack_start(button4);
