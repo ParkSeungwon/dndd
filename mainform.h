@@ -2,12 +2,13 @@ class CommentBox : public Gtk::EventBox
 {
 public:
 	CommentBox();
-	void set_label(string s) { label.set_label(s); }
-	void set_date(string s) { date.set_label(s); }
+	void set_label(string s) { label.set_label(s);}
 	void set_frame(string s) { frame.set_label(s); }
+	void set_date(string s);
 	void set_markup(string s) { label.set_markup(s); }
 protected:
 	bool on_button_press_event(GdkEventButton *e);
+	Glib::ustring date_str;
 	Gtk::VBox vbox;
 	Gtk::Label label, date;
 	Gtk::Frame frame;

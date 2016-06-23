@@ -31,18 +31,24 @@ CommentBox::CommentBox()
 	vbox.add(label);
 	vbox.add(date);
 	//set_size_request(290);
-	label.set_use_markup(true);
-	label.set_line_wrap_mode(Pango::WRAP_CHAR);
-	label.set_line_wrap();
+//	label.set_use_markup(true);
+//	label.set_line_wrap_mode(Pango::WRAP_CHAR);
+//	label.set_line_wrap();
 	label.set_justify(Gtk::JUSTIFY_LEFT);
 	date.set_justify(Gtk::JUSTIFY_RIGHT);
 	show_all_children();
 }
 
+void CommentBox::set_date(string s)
+{
+	date.set_markup("<i><small>\t\ton " + s + "</small></i>");
+	date_str = s;
+}
+
 bool CommentBox::on_button_press_event(GdkEventButton* e)
 {
 	if(e->type == GDK_BUTTON_PRESS && e->button == 1) {
-		pInterface->comment_press(frame.get_label(), label.get_label(), date.get_label());
+		pInterface->comment_press(frame.get_label(), label.get_label(), date_str);
 	}
 	return true;
 }
@@ -215,7 +221,6 @@ int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
     combox = new CommentBox[count];
     
 	for(int i = 0; i < count; i++) {
-        string sbind;//bind args
         if(field == "") {
             string s = board.getText();
             while(s == "Users" || s == "Vote" || s == "Follow") {
@@ -224,25 +229,22 @@ int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
                 count--;
             }
             combox[i].set_label(s);
-            sbind = s;
     	} else if (num == -1){
 			combox[i].set_frame(Util::itos(board.getNumber()) );
 			combox[i].set_label(board.getTitle());
-            sbind = Util::itos(board.getNumber());
 		} else {
 			combox[i].set_frame(board.getId());
 			string s = board.getText();
-			if(s.find_first_of('<', 0) < 10) 
-				combox[i].set_markup(board.getText() + "\n<i><small>\t\ton " + board.getDate() + "</small></i>");
-			else {
+			if(s.find_first_of('<', 0) < 10) {
+				combox[i].set_markup(board.getText());
+				combox[i].set_date(board.getDate());
+			} else {
 				combox[i].set_label(board.getText());
 				combox[i].set_date(board.getDate());
 			}
-            sbind = board.getId() + " " + board.getDate() + "\n" + board.getText();
 		}
     
         vBox4.pack_start(combox[i], Gtk::PACK_SHRINK);
-              
 		board.read();
 	}
     setSensitive();
