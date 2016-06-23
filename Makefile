@@ -3,7 +3,7 @@ INC = -I/usr/local/include
 LIB = -L/usr/local/lib -L/usr/lib 
 OBJ = comment.o member.o mysqlboard.o util.o mysqlquery.o mysqlmember.o mysqlvote.o vote.o mainform.o conndata.o join.o newbook.o follow.o votepopup.o commentpopup.o main.o
 
-gtkmmCFLAG = $(shell pkg-config gtkmm-2.4 --cflags)
+gtkmmCFLAG = $(shell pkg-config gtkmm-2.4 --cflags) -std=c++11
 gtkmmLIB = $(shell pkg-config gtkmm-2.4 --libs)
 webkitgtk-1.0CFLAG = $(shell pkg-config webkit-1.0 --cflags)
 webkitgtk-1.0LIB = $(shell pkg-config webkit-1.0 --libs)
