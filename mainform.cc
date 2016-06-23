@@ -30,10 +30,12 @@ CommentBox::CommentBox()
 	frame.add(vbox);
 	vbox.add(label);
 	vbox.add(date);
-	//set_size_request(290);
+	set_size_request(290);
 //	label.set_use_markup(true);
-//	label.set_line_wrap_mode(Pango::WRAP_CHAR);
-//	label.set_line_wrap();
+	label.set_line_wrap_mode(Pango::WRAP_WORD_CHAR);
+	label.set_line_wrap(true);
+	label.set_size_request(290);
+	date.set_size_request(290);
 	label.set_justify(Gtk::JUSTIFY_LEFT);
 	date.set_justify(Gtk::JUSTIFY_RIGHT);
 	show_all_children();
@@ -41,7 +43,7 @@ CommentBox::CommentBox()
 
 void CommentBox::set_date(string s)
 {
-	date.set_markup("<i><small>\t\ton " + s + "</small></i>");
+	date.set_markup("<i><small>on " + s + "</small></i>");
 	date_str = s;
 }
 
