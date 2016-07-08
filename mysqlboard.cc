@@ -110,7 +110,7 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
 		query += " group by num order by num;";
 	} else if(_page == -1) {//페이지수
         query = "select * from (select * from " + field;
-        query += " order by date, edit desc) as my_table_tmp";
+        query += " order by date, -edit) as my_table_tmp";
 		query += " where num = " + Util::itos(number);
 		query += " group by page;";
     } else {//일반적인 경우
@@ -118,8 +118,8 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
 		query += "select * from " + field;
 		query += " where num = " + Util::itos(number);
 		query += " and page = " + Util::itos(page);
-		query += " order by date, edit desc)";
-        query += " as my_table_tmp group by date, email;";
+		query += " order by date, -edit )";//"as my_table_tmp order by date)";
+        query += " as my_table_tmp group by date, email);";
 	} 
 	//cout << query << endl;
 	myQuery(query);
