@@ -83,8 +83,7 @@ void Mysqlboard::read()
 {
 	if(ri < contents.size()) {
 		if(field == "") {
-			res->next();
-			setText(res->getString(1));
+			setText(contents[ri][0]);
 		} else {
 			setNumber(stoi(contents[ri][0]));//res->getInt("num"));
 			setTitle(contents[ri][3]);//res->getString("title"));
@@ -94,8 +93,8 @@ void Mysqlboard::read()
             setPages(stoi(contents[ri][1]));//res->getInt("page"));
 		}
         //show();
+		ri++;
 	}
-	ri++;
 }
 
 size_t Mysqlboard::setPage(string _field, int _num, int _page)
@@ -107,7 +106,10 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
     
 	if(field == "") {
 		query = "show tables;";//field
-		return myQuery(query);
+		myQuery(query);
+		contents.clear();
+		while(res->next()) contents.push_back({res->getString(1)});
+		return contents.size();
 	} else if(_num == -1) {//목록
 		select(field, "order by num, date desc");
 		ri = 0;
