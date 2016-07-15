@@ -66,15 +66,17 @@ string Mysqlboard::getTOC(string _field, int _num)
     s += Util::Ltos(getVote()) + " can vote to this post.<br /><br>\n\n";
     s += "This post has " + Util::itos(getVotingOption()) + " voting options<br /><br />\n\n";
 	
-    string query = "select page, title from (select * from " + field;
-    query += " order by date, edit desc) as my_table_tmp";
-    query += " where num = " + Util::itos(number);
-    query += " group by page;";
-    myQuery(query);
+	select(_field, "where num = " + Util::itos(_num) + " order by page, date, edit desc");
+	group_by("page");
+//    string query = "select page, title from (select * from " + field;
+//    query += " order by date, edit desc) as my_table_tmp";
+//    query += " where num = " + Util::itos(number);
+//    query += " group by page;";
+//    myQuery(query);
     string toc = "\n<h2>Table of Contents</h2>\n\n";
-    while(res->next()) {
-        toc += res->getString("page") + ". ";
-        toc += res->getString("title") + "<br />\n";
+    for(auto& a : contents) {
+        toc += a[1] + ". ";
+        toc += a[3] + "<br />\n";
     }
     return s + toc;
 }
@@ -103,6 +105,7 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
 	number = _num;
     page = _page;
     string query;
+	ri = 0;
     
 	if(field == "") {
 		query = "show tables;";//field
@@ -111,14 +114,13 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
 		while(res->next()) contents.push_back({res->getString(1)});
 		return contents.size();
 	} else if(_num == -1) {//목록
-		select(field, "order by num, date desc");
-		ri = 0;
+		select(field, "where page = 0 order by num, date");
 		return group_by("num");
 //		query = "select * from (select * from " + field;
 //		query += " order by date) as my_table_tmp";
 //		query += " group by num order by num;";
 	} else if(_page == -1) {//페이지수
-		query = "select max(page) from " + field + " where num = " + Util::itos(number) + ';';
+		query = "select max(page) from " + field + " where num = " + Util::itos(number);
 		myQuery(query);
 		res->next();
 		return res->getInt(1);
@@ -128,7 +130,6 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
 	//	query += " group by page;";
     } else {//일반적인 경우
 		select(field, "where num = " + Util::itos(number) + " and page = " + Util::itos(page) + " order by date, edit desc");
-		ri = 0;
 		return group_by("date");
 //        query = "select * from (";
 //		query += "select * from " + field;

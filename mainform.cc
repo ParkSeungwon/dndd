@@ -175,7 +175,7 @@ bool GtkMainForm::openConnection(string host, string _user, string _pass, string
 
 int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
 {
-    maxPage = board.setPage(field, num, -1) - 1;
+    maxPage = board.setPage(field, num, -1) ;
     curPage = page;
     if(field == "") {
         label1.set_label("Choose a bulletin board to enter.");
