@@ -62,23 +62,21 @@ bool MysqlMember::read(string _id)
 
 bool MysqlMember::login(string user, string pass)
 {
-	string query = "SET sql_mode = (select replace(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''));";
-	myQuery(query);
-    query = "select * from (select * from (select * from Users where email = '";
-    query += user + "' order by date desc) as my_table_tmp group by email) as my_table_tmp" ;
-    query +=  " where password=password('" + pass + "');";
-    //std::cout << query << std::endl;
+	string p = encrypt(pass);//use query cautios.!!
+    string query = "select * from Users where email = '";
+    query += user + "' order by date desc limit 1" ;
     myQuery(query);
-    if(res->next()) {
+	res->next();
+    if(res->getString("password") == p) {
         email = res->getString("email");
         password = res->getString("password");
         level = Util::itoL(res->getInt("level"));
         name = res->getString("name");
         tel = res->getString("tel");
         //follow = res->getString("follow");
-        query = "select email from (select * from Follow where follower = '";
-        query += email + "' order by date desc) as my_table_tmp group by follower;";
-        if(myQuery(query) &&res->next()) follow = res->getString("email");
+        query = "select email from Follow where follower = '";
+        query += email + "' order by date desc limit 1;";
+        if(myQuery(query) && res->next()) follow = res->getString("email");
         return true;
     } else {
         email = "anony@anony";

@@ -1,3 +1,12 @@
+#pragma once
+#include <stdexcept>
+#include <cppconn/connection.h>
+#include <cppconn/driver.h>
+#include <cppconn/exception.h>
+#include <cppconn/resultset.h>
+#include <cppconn/statement.h>
+#include <cppconn/prepared_statement.h>
+
 class Mysqlquery 
 {
 private:
@@ -7,6 +16,8 @@ private:
 
 protected:
 	sql::ResultSet *res;
+	std::string encrypt(std::string);
+	std::string now();
     bool myQuery(string str);
 
 public:

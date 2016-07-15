@@ -81,19 +81,21 @@ string Mysqlboard::getTOC(string _field, int _num)
 
 void Mysqlboard::read()
 {
-	if(res->next()) {
+	if(ri < contents.size()) {
 		if(field == "") {
-			setText(res->getString(1));	
+			res->next();
+			setText(res->getString(1));
 		} else {
-			setNumber(res->getInt("num"));
-			setTitle(res->getString("title"));
-			setId (res->getString("email") );
-			setText (res->getString("contents") );
-			setDate (res->getString("date"));
-            setPages(res->getInt("page"));
+			setNumber(stoi(contents[ri][0]));//res->getInt("num"));
+			setTitle(contents[ri][3]);//res->getString("title"));
+			setId (contents[ri][2]);//res->getString("email") );
+			setText (contents[ri][4]);//res->getString("contents") );
+			setDate (contents[ri][5]);//res->getString("date"));
+            setPages(stoi(contents[ri][1]));//res->getInt("page"));
 		}
         //show();
 	}
+	ri++;
 }
 
 size_t Mysqlboard::setPage(string _field, int _num, int _page)
@@ -103,27 +105,39 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
     page = _page;
     string query;
     
-	if(field == "") query = "show tables;";//field
-    else if(_num == -1) {//목록
-		query = "select * from (select * from " + field;
-		query += " order by date) as my_table_tmp";
-		query += " group by num order by num;";
+	if(field == "") {
+		query = "show tables;";//field
+		return myQuery(query);
+	} else if(_num == -1) {//목록
+		select(field, "order by num, date desc");
+		ri = 0;
+		return group_by("num");
+//		query = "select * from (select * from " + field;
+//		query += " order by date) as my_table_tmp";
+//		query += " group by num order by num;";
 	} else if(_page == -1) {//페이지수
-        query = "select * from (select * from " + field;
-        query += " order by date, edit desc) as my_table_tmp";
-		query += " where num = " + Util::itos(number);
-		query += " group by page;";
+		query = "select max(page) from " + field + " where num = " + Util::itos(number) + ';';
+		myQuery(query);
+		res->next();
+		return res->getInt(1);
+       // query = "select * from (select * from " + field;
+     //   query += " order by date, edit desc) as my_table_tmp";
+	//	query += " where num = " + Util::itos(number);
+	//	query += " group by page;";
     } else {//일반적인 경우
-        query = "select * from (";
-		query += "select * from " + field;
-		query += " where num = " + Util::itos(number);
-		query += " and page = " + Util::itos(page);
-		query += " order by date, edit desc)";
-        query += " as my_table_tmp group by date, email;";
+		select(field, "where num = " + Util::itos(number) + " and page = " + Util::itos(page) + " order by date, edit desc");
+		ri = 0;
+		return group_by("date");
+//        query = "select * from (";
+//		query += "select * from " + field;
+//		query += " where num = " + Util::itos(number);
+//		query += " and page = " + Util::itos(page);
+//		query += " order by date, edit desc)";
+//       query += " as my_table_tmp group by date, email;";
 	} 
 	//cout << query << endl;
-	myQuery(query);
-    return res->rowsCount();
+//	myQuery(query);
+  //  return res->rowsCount();
 }
 
 void Mysqlboard::showtables() {

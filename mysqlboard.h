@@ -1,7 +1,22 @@
-class Mysqlboard : public Board, public Mysqlquery 
+/*
++----------+--------------+------+-----+---------------------+----------------+
+| Field    | Type         | Null | Key | Default             | Extra          |
++----------+--------------+------+-----+---------------------+----------------+
+| num      | int(11)      | NO   |     | NULL                |                |
+| page     | int(11)      | YES  |     | NULL                |                |
+| email    | char(30)     | NO   | PRI | NULL                |                |
+| title    | char(100)    | YES  |     | NULL                |                |
+| contents | longtext     | YES  |     | NULL                |                |
+| date     | datetime     | NO   | PRI | 0000-00-00 00:00:00 |                |
+| edit     | mediumint(9) | NO   | PRI | NULL                | auto_increment |
++----------+--------------+------+-----+---------------------+----------------+
+*/
+#include"mysqldata.h"
+class Mysqlboard : public Board, public SqlData
 {
 private:
 	string addBackSlash(string s);
+	int ri = 0;
 protected:
 	int totalCommentCount;
 	

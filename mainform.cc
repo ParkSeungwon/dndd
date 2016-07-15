@@ -228,6 +228,7 @@ int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
             while(s == "Users" || s == "Vote" || s == "Follow") {
                 board.read();
                 s = board.getText();
+				cout << s << endl;
                 count--;
             }
             combox[i].set_label(s);

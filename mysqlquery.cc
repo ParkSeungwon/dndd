@@ -30,15 +30,28 @@
 using namespace std;
 #include "mysqlquery.h"
 
+string Mysqlquery::encrypt(string pw)
+{
+	myQuery("select password('" + pw + "');");
+	res->next();
+	return res->getString(1);
+}
+
+string Mysqlquery::now()
+{
+	myQuery("select now()");
+	res->next();
+	return res->getString(1);
+}
 
 bool Mysqlquery::myQuery(std::string str)
 {
     bool ok = false;
 	try
 	{
-        //cout << "Executing query....." << endl << endl;
+        cout << "Executing query....." << endl << str << endl;
         res = stmt->executeQuery(str);
-		//cout << "Done." << endl;
+		cout << "Done." << endl;
         ok = true;
 	}
 	catch (sql::SQLException &e) 
@@ -56,12 +69,12 @@ bool Mysqlquery::connect(string host, string user, string pass, string db)
 {
     bool ok = false;
     try {
-        //cout << "Connecting database to " << host << endl << endl;
+        cout << "Connecting database to " << host << endl << endl;
         driver = get_driver_instance();
         con = driver->connect(host, user, pass);
         con->setSchema(db);
         stmt = con->createStatement();
-        //std::cout << "done.." << std::endl;
+        std::cout << "done.." << std::endl;
         ok = true;
     }
     catch (sql::SQLException &e) {
