@@ -150,6 +150,11 @@ void Mysqlboard::showtables() {
 
 string Mysqlboard::addBackSlash(string s) {
     int apo, i=0;
+    while((apo = s.find_first_of('\\', i)) != string::npos) {
+		s.insert(apo, 1, '\\');
+		i = apo + 2;
+    }
+	apo = 0, i=0;
     while((apo = s.find_first_of('\'', i)) < s.length()) {
         if(s[apo-1] != '\\') {
             s.insert(apo, 1, '\\');
