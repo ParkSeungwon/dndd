@@ -14,7 +14,7 @@ struct FollowTable
     bool secret;
 };
 
-class MysqlVote : public Vote, public Mysqlquery
+class MysqlVote : public Vote, public SqlQuery 
 {
 private:
     int findMan(VoteResult *vr, int count, string email, int start);

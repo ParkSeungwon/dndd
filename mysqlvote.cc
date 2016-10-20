@@ -1,24 +1,3 @@
-/*
- * mysqlvote.cc
- * This file is part of dndd
- *
- * Copyright (C) 2015 - Seungwon Park
- *
- * dndd is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * dndd is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with dndd. If not, see <http://www.gnu.org/licenses/>.
- */
-
- 
 #include <cppconn/connection.h>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
@@ -30,6 +9,7 @@ using namespace std;
 #include "mysqlquery.h"
 #include "util.h"
 #include "vote.h"
+#include "sqldata.h"
 #include "mysqlvote.h"
 
 void MysqlVote::write()
@@ -42,110 +22,6 @@ void MysqlVote::write()
 	query += Util::itos(secret) + ", now());";
 	cout << query << endl;
 	myQuery(query);
-}
-
-string MysqlVote::calculateVote(int option)
-{
-	long vOption[option+1][2];
-	for (int m = 0; m <= option; m++) {
-		vOption[m][0] = 0;
-		vOption[m][1] = 0;
-	}
-
-	string query = "select * from (select * from Vote inner join (select email, name, level from Users order by date desc) as my_table_tmp  using (email) where level > 2 and field = '";
-	query += field + "' and num = ";
-	query += Util::itos(number) + " order by Vote.date desc) as my_table_tmp group by email order by email;";
-	cout << query << endl;
-	myQuery(query);
-	int cRep = res->rowsCount();
-	VoteResult vrRepresent[cRep];
-	int i = 0;
-	while (res->next()) {
-		vrRepresent[i].email = res->getString("email");
-		vrRepresent[i].name = res->getString("name");
-		vrRepresent[i].votedfor = res->getInt("votedfor");
-		vrRepresent[i].date = res->getString("date");
-		vrRepresent[i].secret = false;
-		i++;
-	}
-
-	query = "select * from (select * from Follow order by date desc) as my_table_tmp group by follower order by email, follower;";
-	cout << query << endl;
-	myQuery(query);
-	int cFT  = res->rowsCount();
-	FollowTable fTable[cFT];
-	i = 0;
-	while (res->next()) {
-		fTable[i].email = res->getString("email");
-		fTable[i].follower = res->getString("follower");
-		fTable[i].secret = res->getInt("secret");
-		i++;
-	}
-
-	query = "select * from (select * from Vote inner join (select email, name, level from Users order by date desc) as my_table_tmp  using (email) where level < 3 and field = '";
-	query += field + "' and num = ";
-	query += Util::itos(number) + " order by date desc) as my_table_tmp group by email order by email;";
-	cout << query << endl;
-	myQuery(query);
-	int cReg = res->rowsCount();
-	VoteResult vrRegistered[cReg];
-	i = 0;
-	while (res->next()) {
-		vrRegistered[i].email = res->getString("email");
-		vrRegistered[i].name = res->getString("name");
-		vrRegistered[i].votedfor = res->getInt("votedfor");
-		vrRegistered[i].date = res->getString("date");
-		vrRegistered[i].secret = res->getInt("secret");
-		i++;
-	}
-	string result = "\tVotes by representatives\n\n";
-	result += "\temail             name           votedfor           date\n";
-	int j = 0, k = 0;
-	for (i = 0; i < cRep; i++) {//Representatives
-		result += "\n" + vrRepresent[i].email + "    " + vrRepresent[i].name + "    ";
-		result += Util::itos(vrRepresent[i].votedfor) + "    ";
-		result += vrRepresent[i].date + "\nfollowers : ";
-		vOption[vrRepresent[i].votedfor][vrRepresent[i].secret]++;
-		for(j = 0; j < cFT; j++) {//follower
-			j = findMan(fTable, cFT, vrRepresent[i].email, j);
-			if(j != cFT) {//representative have follower
-				if(fTable[j].secret == 0) {//follow publicly
-					result += fTable[j].follower + "(";
-					k = findMan(vrRegistered, cReg, fTable[j].follower, 0);
-					if(k != cReg) {//follower himself voted
-						if(vrRegistered[k].secret == 0) //follower vote publicly
-							result += Util::itos(vrRegistered[k].votedfor) +") ";
-						else result += "?) ";
-						vOption[vrRegistered[k].votedfor][vrRegistered[k].secret]++;
-						vrRegistered[k].votedfor = 0;//mark calculated vote
-					}
-					else {//no vote->follow secret 
-						result += "=) ";
-						vOption[vrRepresent[i].votedfor][fTable[j].secret]++;
-					}
-				}
-			}
-		}
-	}
-	result += "\n\n\nVotes by registered \n\n";
-	for(i = 0; i < cReg; i++ ) {
-		if(vrRegistered[i].votedfor != 0) {
-			if(vrRegistered[i].secret == 0) {
-				result += vrRegistered[i].email + "(";
-				result += Util::itos(vrRegistered[i].votedfor) + ") ";
-			}
-			vOption[vrRegistered[i].votedfor][vrRegistered[i].secret]++;
-		}
-	}
-
-	result += "\nTotal voting calculation\n";
-	result += "\t\tOpen vote          private vote                   total\n";
-	for (i = 1; i <= option; i++) {
-		result += "option" + Util::itos(i) +" :\t\t "+ Util::itos(vOption[i][0]);
-		result += "\t\t\t\t" + Util::itos(vOption[i][1]) + "\t\t\t\t ";
-		result += Util::itos(vOption[i][0] + vOption[i][1]) + "\n";
-	}
-	return result;
 }
 
 int MysqlVote::findMan(VoteResult *vr, int count, string email, int start) 
@@ -173,50 +49,59 @@ string MysqlVote::calculateVoteHtml(string _field, int _number, int option)
 		vOption[m][1] = 0;
 	}
 
-	string query = "select * from (select * from Vote inner join (select email, name, level from Users order by date desc) as my_table_tmp  using (email) where level > 2 and field = '";
-	query += _field + "' and num = " + Util::itos(_number);
-	query += " order by date desc) as my_table_tmp group by email order by email;";
+	select("Vote", "where level>2 and field = '" + _field + "' and num = " + 
+			Util::itos(_number) + " order by email, date desc");
+	
+//	string query = "select * from (select * from Vote inner join (select email, name from Users order by date desc) as my_table_tmp  using (email) where level > 2 and field = '";
+//	query += _field + "' and num = " + Util::itos(_number);
+//	query += " order by date desc) as my_table_tmp group by email order by email;";
 	//cout << query << endl;
-	myQuery(query);
-	int cRep = res->rowsCount();
+//	myQuery(query);res->rowsCount();
+	int cRep = group_by("email");
 	VoteResult vrRepresent[cRep];
 	int i = 0;
-	while (res->next()) {
-		vrRepresent[i].email = res->getString("email");
-		vrRepresent[i].name = res->getString("name");
-		vrRepresent[i].votedfor = res->getInt("votedfor");
-		vrRepresent[i].date = res->getString("date");
+	for(auto& a : contents) {
+		vrRepresent[i].email = (string)a[2];
+		vrRepresent[i].name = (string)a[2];
+		vrRepresent[i].votedfor = a[3];
+		vrRepresent[i].date = (string)a[5];
 		vrRepresent[i].secret = false;
 		i++;
 	}
 
-	query = "select * from (select * from Follow order by date desc) as my_table_tmp group by follower order by email, follower;";
+	select("Follow", "order by follower, date desc");
+
+	//query = "select * from (select * from Follow order by date desc) as my_table_tmp group by follower order by email, follower;";
 	//cout << query << endl;
-	myQuery(query);
-	int cFT  = res->rowsCount();
+	//myQuery(query);
+	int cFT  = group_by("follower");//res->rowsCount();
 	FollowTable fTable[cFT];
 	i = 0;
-	while (res->next()) {
-		fTable[i].email = res->getString("email");
-		fTable[i].follower = res->getString("follower");
-		fTable[i].secret = res->getInt("secret");
+//	while (res->next()) {
+	for(auto& a : contents) {
+		fTable[i].email = (string)a[0];//res->getString("email");
+		fTable[i].follower = (string)a[1];//res->getString("follower");
+		fTable[i].secret = (int)a[2];//res->getInt("secret");
 		i++;
 	}
 
-	query = "select * from (select * from Vote inner join (select email, name, level from Users order by date desc) as my_table_tmp  using (email) where level < 3 and field = '";
-	query += _field + "' and num = " + Util::itos(_number);
-	query += " order by date desc) as my_table_tmp group by email order by email;";
+	select("Vote", "where level < 3 and field = '" + _field + "' and num = " + 
+			Util::itos(_number) + " order by email, date desc");
+//	query = "select * from (select * from Vote inner join (select email, name, level from Users order by date desc) as my_table_tmp  using (email) where level < 3 and field = '";
+//	query += _field + "' and num = " + Util::itos(_number);
+//	query += " order by date desc) as my_table_tmp group by email order by email;";
 	//cout << query << endl;
-	myQuery(query);
-	int cReg = res->rowsCount();
+//	myQuery(query);
+	int cReg = group_by("email");//res->rowsCount();
 	VoteResult vrRegistered[cReg];
 	i = 0;
-	while (res->next()) {
-		vrRegistered[i].email = res->getString("email");
-		vrRegistered[i].name = res->getString("name");
-		vrRegistered[i].votedfor = res->getInt("votedfor");
-		vrRegistered[i].date = res->getString("date");
-		vrRegistered[i].secret = res->getInt("secret");
+//	while (res->next()) {
+	for(auto& a : contents) {
+		vrRegistered[i].email = (string)a[2];//res->getString("email");
+		vrRegistered[i].name = (string)a[2];//res->getString("name");
+		vrRegistered[i].votedfor = (int)a[3];//res->getInt("votedfor");
+		vrRegistered[i].date = (string)a[5];//res->getString("date");
+		vrRegistered[i].secret = (int)a[4];//res->getInt("secret");
 		i++;
 	}
 	

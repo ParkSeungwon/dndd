@@ -9,7 +9,7 @@ webkitgtk-1.0CFLAG = $(shell pkg-config webkit-1.0 --cflags)
 webkitgtk-1.0LIB = $(shell pkg-config webkit-1.0 --libs)
 
 dndd : $(OBJ)
-	$(CC) -g -o dndd $(LIB) $(OBJ) $(webkitgtk-1.0LIB) $(gtkmmLIB) -lmysqlcppconn
+	$(CC) -g -o dndd $(LIB) $(OBJ) $(webkitgtk-1.0LIB) $(gtkmmLIB) -lzezeon -lmysqlcppconn
 
 test : $(OBJ)
 	$(CC) -g -o test test.cpp $(LIB) $(OBJ) $(webkitgtk-1.0LIB) $(gtkmmLIB) -lmysqlcppconn
@@ -20,7 +20,7 @@ member.o : member.h member.cc
 vote.o : vote.cc vote.h
 	$(CC) -g -c vote.cc
 mysqlvote.o : mysqlvote.cc mysqlvote.h
-	$(CC) -g -c mysqlvote.cc $(INC)
+	$(CC) -g -c mysqlvote.cc $(INC) -std=c++11
 mysqlboard.o : mysqlboard.h mysqlboard.cc
 	$(CC) -g -c $(INC) mysqlboard.cc -std=c++11
 mysqlquery.o : mysqlquery.h mysqlquery.cc
