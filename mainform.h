@@ -74,14 +74,14 @@ class GtkMainForm : public Gtk::Window, public CommentInterface
     Mysqlboard board;
     MysqlMember member;
     MysqlVote vote;
-    auto_ptr<GtkWidget> webview;
-    auto_ptr<ConnectPopup> connPopup;
-    auto_ptr<NewBook> newbook;
-    auto_ptr<FollowPopup> followPopup;
-    auto_ptr<VotePopup> votePopup;
-    //auto_ptr<Progress> progress;
-    auto_ptr<CommentPopup> commentpopup;
-    auto_ptr<ChangeAccount> changeAccount;
+    shared_ptr<GtkWidget> webview;
+    shared_ptr<ConnectPopup> connPopup;
+    shared_ptr<NewBook> newbook;
+    shared_ptr<FollowPopup> followPopup;
+    shared_ptr<VotePopup> votePopup;
+    //shared_ptr<Progress> progress;
+    shared_ptr<CommentPopup> commentpopup;
+    shared_ptr<ChangeAccount> changeAccount;
     Gtk::MessageDialog* dialog1;
     
  public:

@@ -1,24 +1,3 @@
-/*
- * mysqlboard.cc
- * This file is part of dndd
- *
- * Copyright (C) 2015 - Seungwon Park
- *
- * dndd is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * dndd is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with dndd. If not, see <http://www.gnu.org/licenses/>.
- */
-
- 
 #include <cppconn/connection.h>
 #include <cppconn/driver.h>
 #include <cppconn/exception.h>
@@ -28,7 +7,6 @@
 using namespace std;
 #include "member.h"
 #include "comment.h"
-#include "mysqlquery.h"
 #include "mysqlboard.h"
 #include "util.h"
 
@@ -75,8 +53,8 @@ string Mysqlboard::getTOC(string _field, int _num)
 //    myQuery(query);
     string toc = "\n<h2>Table of Contents</h2>\n\n";
     for(auto& a : contents) {
-        toc += a[1] + ". ";
-        toc += a[3] + "<br />\n";
+        toc += (string)a[1] + ". ";
+        toc += (string)a[3] + "<br />\n";
     }
     return s + toc;
 }
@@ -111,7 +89,7 @@ size_t Mysqlboard::setPage(string _field, int _num, int _page)
 		query = "show tables;";//field
 		myQuery(query);
 		contents.clear();
-		while(res->next()) contents.push_back({res->getString(1)});
+		while(res->next()) contents.push_back({Any{res->getString(1)}});
 		return contents.size();
 	} else if(_num == -1) {//목록
 		select(field, "where page = 0 order by num, date");

@@ -1,9 +1,10 @@
 CC = g++
 INC = -I/usr/local/include
 LIB = -L/usr/local/lib -L/usr/lib 
-OBJ = comment.o member.o mysqlboard.o util.o mysqlquery.o mysqlmember.o mysqlvote.o vote.o mainform.o conndata.o join.o newbook.o follow.o votepopup.o commentpopup.o main.o mysqldata.o
+OBJ = comment.o member.o mysqlboard.o util.o mysqlmember.o mysqlvote.o vote.o mainform.o conndata.o join.o newbook.o follow.o votepopup.o commentpopup.o main.o
 
-gtkmmCFLAG = $(shell pkg-config gtkmm-2.4 --cflags) -std=c++11
+CFLAG = -std=c++11 -fmax-errors=1
+gtkmmCFLAG = $(shell pkg-config gtkmm-2.4 --cflags) -std=c++11 -fmax-errors=1
 gtkmmLIB = $(shell pkg-config gtkmm-2.4 --libs)
 webkitgtk-1.0CFLAG = $(shell pkg-config webkit-1.0 --cflags)
 webkitgtk-1.0LIB = $(shell pkg-config webkit-1.0 --libs)
@@ -22,11 +23,9 @@ vote.o : vote.cc vote.h
 mysqlvote.o : mysqlvote.cc mysqlvote.h
 	$(CC) -g -c mysqlvote.cc $(INC) -std=c++11
 mysqlboard.o : mysqlboard.h mysqlboard.cc
-	$(CC) -g -c $(INC) mysqlboard.cc -std=c++11
-mysqlquery.o : mysqlquery.h mysqlquery.cc
-	$(CC) -g -c $(INC) mysqlquery.cc
+	$(CC) -g -c $(INC) mysqlboard.cc -std=c++11 -fmax-errors=1
 mysqlmember.o : mysqlmember.h mysqlmember.cc
-	$(CC) -g -c $(INC) mysqlmember.cc -std=c++11
+	$(CC) -g -c $(INC) mysqlmember.cc -std=c++11 -fmax-errors=1
 main.o : main.cc main.h mainform.h
 	$(CC) -g -c main.cc $(INC)  $(gtkmmCFLAG) $(webkitgtk-1.0CFLAG) 
 util.o : util.h

@@ -9,7 +9,7 @@ using namespace std;
 #include "mysqlquery.h"
 #include "util.h"
 #include "vote.h"
-#include "sqldata.h"
+#include "mysqldata.h"
 #include "mysqlvote.h"
 
 void MysqlVote::write()
@@ -19,7 +19,7 @@ void MysqlVote::write()
 	query += Util::itos(number) + ", '";
 	query += votingId + "', ";
 	query += Util::itos(votedFor) + ", ";
-	query += Util::itos(secret) + ", now());";
+	query += Util::itos(secret) + ", now(), " + Util::itos(level) + ");";
 	cout << query << endl;
 	myQuery(query);
 }
@@ -40,7 +40,6 @@ int MysqlVote::findMan(FollowTable *vr, int count, string email, int start)
 	return count;
 }
 
-
 string MysqlVote::calculateVoteHtml(string _field, int _number, int option)
 {
 	long vOption[option+1][2];
@@ -52,11 +51,6 @@ string MysqlVote::calculateVoteHtml(string _field, int _number, int option)
 	select("Vote", "where level>2 and field = '" + _field + "' and num = " + 
 			Util::itos(_number) + " order by email, date desc");
 	
-//	string query = "select * from (select * from Vote inner join (select email, name from Users order by date desc) as my_table_tmp  using (email) where level > 2 and field = '";
-//	query += _field + "' and num = " + Util::itos(_number);
-//	query += " order by date desc) as my_table_tmp group by email order by email;";
-	//cout << query << endl;
-//	myQuery(query);res->rowsCount();
 	int cRep = group_by("email");
 	VoteResult vrRepresent[cRep];
 	int i = 0;
@@ -70,14 +64,9 @@ string MysqlVote::calculateVoteHtml(string _field, int _number, int option)
 	}
 
 	select("Follow", "order by follower, date desc");
-
-	//query = "select * from (select * from Follow order by date desc) as my_table_tmp group by follower order by email, follower;";
-	//cout << query << endl;
-	//myQuery(query);
 	int cFT  = group_by("follower");//res->rowsCount();
 	FollowTable fTable[cFT];
 	i = 0;
-//	while (res->next()) {
 	for(auto& a : contents) {
 		fTable[i].email = (string)a[0];//res->getString("email");
 		fTable[i].follower = (string)a[1];//res->getString("follower");
@@ -87,15 +76,9 @@ string MysqlVote::calculateVoteHtml(string _field, int _number, int option)
 
 	select("Vote", "where level < 3 and field = '" + _field + "' and num = " + 
 			Util::itos(_number) + " order by email, date desc");
-//	query = "select * from (select * from Vote inner join (select email, name, level from Users order by date desc) as my_table_tmp  using (email) where level < 3 and field = '";
-//	query += _field + "' and num = " + Util::itos(_number);
-//	query += " order by date desc) as my_table_tmp group by email order by email;";
-	//cout << query << endl;
-//	myQuery(query);
 	int cReg = group_by("email");//res->rowsCount();
 	VoteResult vrRegistered[cReg];
 	i = 0;
-//	while (res->next()) {
 	for(auto& a : contents) {
 		vrRegistered[i].email = (string)a[2];//res->getString("email");
 		vrRegistered[i].name = (string)a[2];//res->getString("name");

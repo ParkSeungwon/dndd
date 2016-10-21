@@ -1,25 +1,6 @@
-/*
- * mainform.cc
- * This file is part of dndd
- *
- * Copyright (C) 2015 - Seungwon Park
- *
- * dndd is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * dndd is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with dndd. If not, see <http://www.gnu.org/licenses/>.
- */
-
 #include "main.h"
 #include<functional>
+#include<memory>
 using namespace std::placeholders;
 CommentInterface *pInterface;
 
@@ -75,7 +56,7 @@ GtkMainForm::GtkMainForm(int argc, char *argv[]) :
 	menuBar1Setup();
 	toolbar1Setup();
     
-	webview = auto_ptr<GtkWidget>(webkit_web_view_new());
+	webview = shared_ptr<GtkWidget>(webkit_web_view_new());
 	scrolledWindow1.add(*Glib::wrap(webview.get()));
     viewport1.set_resize_mode(Gtk::RESIZE_PARENT);
 	
@@ -333,7 +314,7 @@ bool GtkMainForm::join(string email, string pass, string name, string tel, strin
 bool GtkMainForm::change_account(GdkEventButton *event)
 {
 	if(member.getLevel() > anonymous) {
-		changeAccount = auto_ptr<ChangeAccount>(new ChangeAccount(member.getEmail(), member.getName(), member.getTel()));
+		changeAccount = shared_ptr<ChangeAccount>(new ChangeAccount(member.getEmail(), member.getName(), member.getTel()));
 		changeAccount->set_transient_for(*this);
 		changeAccount->show();
 		return true;
@@ -360,12 +341,12 @@ void GtkMainForm::comment_press(Glib::ustring f, Glib::ustring l, Glib::ustring 
 {
     if(curLev == 3) {//popupId();
         if(member.getEmail() == f) {
-			commentpopup = auto_ptr<CommentPopup>(new CommentPopup('e', l, d));  
+			commentpopup = shared_ptr<CommentPopup>(new CommentPopup('e', l, d));  
 			commentpopup->set_transient_for(*this);
 			commentpopup->show();
         }
         else if(member.getLevel() > anonymous && member.getLevel() < representative) {
-            followPopup = auto_ptr<FollowPopup>(new FollowPopup);
+            followPopup = shared_ptr<FollowPopup>(new FollowPopup);
             followPopup->entry2.set_text(f);
             followPopup->label3.set_label("currently following " + member.getFollow());
             followPopup->set_transient_for(*this);
@@ -406,7 +387,7 @@ int GtkMainForm::votedFor(int option, bool secret)
 {
     Level l = member.getLevel();
     if(l >= representative && secret == true) return -1;//representatives cannot vote secretly
-    vote.setVote(board.getField(), board.getNumber(), member.getEmail(), option, secret);
+    vote.setVote(board.getField(), board.getNumber(), member.getEmail(), option, secret, member.getLevel());
     vote.write();
     label1.set_label("voted for " + Util::itos(option));
     return l;

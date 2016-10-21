@@ -12,7 +12,7 @@
 +----------+--------------+------+-----+---------------------+----------------+
 */
 #include"mysqldata.h"
-class Mysqlboard : public Board, public SqlData
+class Mysqlboard : public Board, public SqlQuery
 {
 private:
 	string addBackSlash(string s);

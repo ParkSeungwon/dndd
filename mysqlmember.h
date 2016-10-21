@@ -12,7 +12,7 @@
 */
 #pragma once
 #include"mysqldata.h"
-class MysqlMember : public Member, public Mysqlquery
+class MysqlMember : public Member, public SqlQuery
 {
  public:
 	bool read(string _id);//email주소를 아이디로 사용함.
