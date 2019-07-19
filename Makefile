@@ -1,7 +1,7 @@
 CC = g++
 INC = -I/usr/local/include
 LIB = -L/usr/local/lib -L/usr/lib 
-OBJ = comment.o member.o mysqlboard.o util.o mysqlquery.o mysqlmember.o mysqlvote.o vote.o mainform.o conndata.o join.o newbook.o follow.o votepopup.o commentpopup.o main.o
+OBJ = comment.o member.o mysqlboard.o util.o mysqlquery.o mysqlmember.o mysqlvote.o vote.o mainform.o conndata.o join.o newbook.o follow.o votepopup.o commentpopup.o main.o base64.o
 
 gtkmmCFLAG = $(shell pkg-config gtkmm-2.4 --cflags) -std=c++11
 gtkmmLIB = $(shell pkg-config gtkmm-2.4 --libs)
@@ -43,6 +43,8 @@ votepopup.o : votepopup.cc votepopup.h
 	$(CC) -c -g votepopup.cc  $(gtkmmCFLAG) $(INC)
 commentpopup.o : commentpopup.cc commentpopup.h
 	$(CC) -c -g commentpopup.cc $(gtkmmCFLAG) $(INC)  $(webkitgtk-1.0CFLAG)
+base64.o : base64.cc
+	$(CC) -c -g base64.cc
 	
 install : 
 	cp dndd /usr/local/bin

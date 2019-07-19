@@ -36,9 +36,9 @@ bool Mysqlquery::myQuery(std::string str)
     bool ok = false;
 	try
 	{
-        //cout << "Executing query....." << endl << endl;
+		cerr << str << "\nExecuting query.....";
         res = stmt->executeQuery(str);
-		//cout << "Done." << endl;
+		cerr << "Done." << endl;
         ok = true;
 	}
 	catch (sql::SQLException &e) 

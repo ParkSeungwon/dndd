@@ -23,6 +23,7 @@
 using namespace std::placeholders;
 CommentInterface *pInterface;
 
+vector<uint8_t> base64_decode(string s);
 CommentBox::CommentBox()
 {
 	add_events(Gdk::BUTTON_PRESS_MASK);
@@ -206,6 +207,8 @@ int GtkMainForm::commentSetup(string field, int num, int page, bool reload )
 			textView1.get_buffer()->set_text(s);
 			if(s.find_first_of('<', 0) < 10) notebook.set_current_page(0);
 			else notebook.set_current_page(1);
+			auto v = base64_decode(s);
+			s = string{v.begin(), v.end()};
 			if(reload == true) webkit_web_view_load_html_string(WEBKIT_WEB_VIEW(webview.get()), s.c_str(), "www.naver.com");
 		}
         else {
