@@ -2,3 +2,7 @@
 *~
 *.swp
 dndd
+find
+.
+-size
++3M
